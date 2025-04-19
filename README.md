@@ -1,2 +1,2 @@
-# uselessknowledge
-my experiment to share knowledge
+# Useless Knowledge
+Everyone's a secret expert of something... Tell yours!
