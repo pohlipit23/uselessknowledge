@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Useless Knowledge - Share Your Secret Expertise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Removed padding-top */
+         }
+        .proof-item { transition: transform 0.2s ease-in-out; }
+        .proof-item:hover { transform: translateY(-3px); }
+        #knowledgeModal { z-index: 50; } /* Ensure modal is above content */
+        .loading-placeholder::after { content: 'Loading...'; color: #9ca3af; }
+        .error-placeholder::after { content: 'Could not load entries.'; color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center p-6">
+
+    <div class="bg-white p-8 sm:p-12 rounded-xl shadow-lg max-w-3xl w-full text-center">
+
+        <div class="flex justify-between items-center mb-8">
+            <span class="text-xl font-bold text-gray-800">Useless Knowledge</span>
+            <button id="openModalBtnHeader" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm transition duration-200 flex-shrink-0">
+                Share!
+            </button>
+        </div>
+
+        <section class="mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-gray-800 mb-3"> Beyond the Bio. </h1>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-blue-600 mb-4"> What's Your Secret Expertise? </h2>
+            <p class="text-lg text-gray-600 max-w-xl mx-auto"> Your job title doesn't define you. We all harbor deep knowledge in areas completely unrelated to our careers. It's time to celebrate that beautifully 'useless' expertise! </p>
+        </section>
+
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-700 mb-6">What others are experts in:</h3>
+            <div id="testimonialsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                <div class="bg-gray-100 p-4 rounded-lg shadow-sm loading-placeholder"></div>
+                <div class="bg-gray-100 p-4 rounded-lg shadow-sm loading-placeholder hidden sm:block"></div>
+                <div class="bg-gray-100 p-4 rounded-lg shadow-sm loading-placeholder hidden sm:block"></div>
+                <div class="bg-gray-100 p-4 rounded-lg shadow-sm loading-placeholder hidden sm:block"></div>
+            </div>
+        </section>
+
+        <section>
+            <p class="text-lg text-gray-600 mb-6"> Ready to share yours? Don't be shy! </p>
+            <button id="openModalBtnMain" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out text-xl transform hover:-translate-y-0.5">
+                Share Your Useless Knowledge!
+            </button>
+        </section>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+             &copy; 2025 uselessknowledge.io - A fun experiment.
+        </footer>
+    </div>
+    <div id="knowledgeModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-xl max-w-lg w-full relative text-left overflow-y-auto max-h-[90vh]">
+            <button id="closeModalBtn" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6">Tell Us About Your Expertise</h3>
+            <form id="knowledgeForm">
+                 <div class="mb-4">
+                    <label for="headline" class="block text-sm font-medium text-gray-700 mb-1">Headline</label>
+                    <input type="text" id="headline" name="headline" maxlength="70" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Medieval Brewing Techniques Expert" required>
+                    <p class="text-xs text-gray-500 mt-1">A catchy title for your expertise (max 70 chars).</p>
+                </div>
+                <div class="mb-4">
+                    <label for="knowledge_domain" class="block text-sm font-medium text-gray-700 mb-1">Knowledge Domain (Optional)</label>
+                    <input type="text" id="knowledge_domain" name="knowledge_domain" maxlength="50" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 14th Century Fermentation">
+                    <p class="text-xs text-gray-500 mt-1">Specific area if different from headline (max 50 chars).</p>
+                </div>
+                <div class="mb-4">
+                    <label for="knowledge_details" class="block text-sm font-medium text-gray-700 mb-1">Details</label>
+                    <textarea id="knowledge_details" name="knowledge_details" rows="4" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., I've recreated 12 historically accurate brewing methods..." required></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Give us a brief, fun description of your knowledge.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="day_job" class="block text-sm font-medium text-gray-700 mb-1">Your Day Job</label>
+                    <input type="text" id="day_job" name="day_job" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Pediatric Nurse" required>
+                    <p class="text-xs text-gray-500 mt-1">What you do professionally (adds to the fun contrast!).</p>
+                </div>
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name (Optional)</label>
+                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Alex P.">
+                    <p class="text-xs text-gray-500 mt-1">Your name or initials, if you'd like to be credited.</p>
+                </div>
+                 <p id="submission-message" class="text-sm mt-4 mb-4"></p>
+                <div class="text-right">
+                    <button type="submit" id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200 disabled:opacity-50">
+                        Submit My Knowledge
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const SUPABASE_URL = 'https://icmgidovdzriuzpmpndm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljbWdpZG92ZHpyaXV6cG1wbmRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMzI0MjAsImV4cCI6MjA2MDYwODQyMH0.ljhC-PUryt78KrNXK0buhsBF9e6LapUWvMr-d5X8cfU';
+        const RECAPTCHA_SITE_KEY = '6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0';
+        const TABLE_NAME = 'knowledge_entries';
+
+        // --- Initialize Supabase Client ---
+        let supabase;
+        try {
+            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) { console.error("Error initializing Supabase:", error); }
+
+        // --- DOM Elements ---
+        const modal = document.getElementById('knowledgeModal');
+        const openModalBtnMain = document.getElementById('openModalBtnMain');
+        const openModalBtnHeader = document.getElementById('openModalBtnHeader'); // ID is now on the button inside the card
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const knowledgeForm = document.getElementById('knowledgeForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const submissionMessage = document.getElementById('submission-message');
+        const testimonialsGrid = document.getElementById('testimonialsGrid');
+
+        // --- Modal Logic (Remains the same) ---
+        const openModal = () => {
+            modal.classList.remove('hidden');
+            submissionMessage.textContent = '';
+        }
+        const closeModal = () => modal.classList.add('hidden');
+        openModalBtnMain.addEventListener('click', openModal);
+        openModalBtnHeader.addEventListener('click', openModal); // Still works!
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+
+        // --- Testimonial Loading (Remains the same) ---
+        async function loadTestimonials() {
+            if (!supabase) {
+                console.error("Supabase client not available.");
+                testimonialsGrid.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500 error-placeholder"></div>';
+                return;
+            }
+            try {
+                const { data, error } = await supabase
+                    .from(TABLE_NAME)
+                    .select('headline, knowledge_details, day_job, name')
+                    .order('created_at', { ascending: false })
+                    .limit(4);
+                if (error) throw error;
+                testimonialsGrid.innerHTML = '';
+                if (data && data.length > 0) {
+                    const bgColors = ['bg-blue-50', 'bg-green-50', 'bg-yellow-50', 'bg-purple-50'];
+                    const textColors = ['text-blue-700', 'text-green-700', 'text-yellow-700', 'text-purple-700'];
+                    const borderColors = ['border-blue-200', 'border-green-200', 'border-yellow-200', 'border-purple-200'];
+                    data.forEach((entry, index) => {
+                        const card = document.createElement('div');
+                        const colorIndex = index % bgColors.length;
+                        card.className = `${bgColors[colorIndex]} p-4 rounded-lg shadow-sm proof-item flex flex-col h-full`;
+                        card.innerHTML = `
+                            <h4 class="text-lg font-semibold text-gray-900 mb-1">${entry.headline || 'Expertise Headline'}</h4>
+                            <p class="text-sm ${textColors[colorIndex]} mb-2">${entry.day_job || 'Professional'} by day</p>
+                            <blockquote class="text-gray-700 italic border-l-4 ${borderColors[colorIndex]} pl-3 text-sm flex-grow">
+                                "${entry.knowledge_details || 'No details provided.'}" </blockquote>
+                            ${entry.name ? `<span class="text-xs text-gray-500 mt-2 text-right">- ${entry.name}</span>` : ''}
+                        `;
+                        testimonialsGrid.appendChild(card);
+                    });
+                } else {
+                    testimonialsGrid.innerHTML = '<p class="col-span-1 sm:col-span-2 text-center text-gray-500">Be the first to share your knowledge!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading testimonials:', error);
+                testimonialsGrid.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500 error-placeholder"></div>';
+            }
+        }
+
+        // --- Form Submission Logic (Remains the same) ---
+        knowledgeForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            submitBtn.disabled = true;
+            submissionMessage.textContent = 'Submitting...';
+            submissionMessage.className = 'text-sm mt-4 mb-4 text-blue-600';
+             if (!supabase) {
+                console.error("Supabase client not available.");
+                submissionMessage.textContent = 'Error: Cannot connect to database.';
+                submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
+                submitBtn.disabled = false;
+                return;
+            }
+            grecaptcha.ready(function() {
+                grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
+                    console.log('reCAPTCHA token (needs server-side validation):', token);
+                    const formData = new FormData(knowledgeForm);
+                    const submissionData = Object.fromEntries(formData.entries());
+                    if (!submissionData.knowledge_domain) submissionData.knowledge_domain = null;
+                    if (!submissionData.name) submissionData.name = null;
+                    try {
+                        const { error } = await supabase.from(TABLE_NAME).insert([submissionData]);
+                        if (error) throw error;
+                        submissionMessage.textContent = 'Thank you for sharing your knowledge!';
+                        submissionMessage.className = 'text-sm mt-4 mb-4 text-green-600';
+                        knowledgeForm.reset();
+                        await loadTestimonials();
+                        setTimeout(closeModal, 1500);
+                    } catch (error) {
+                        console.error('Error submitting data:', error);
+                        submissionMessage.textContent = `Submission failed: ${error.message || 'Please try again.'}`;
+                        submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
+                    } finally {
+                        submitBtn.disabled = false;
+                    }
+                }).catch(function (error) {
+                     console.error('reCAPTCHA execution error:', error);
+                     submissionMessage.textContent = 'CAPTCHA error. Please try again.';
+                     submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
+                     submitBtn.disabled = false;
+                 });
+            });
+        });
+
+        // --- Initial Load (Remains the same) ---
+         document.addEventListener('DOMContentLoaded', () => {
+            loadTestimonials();
+         });
+    </script>
+
+</body>
+</html>
