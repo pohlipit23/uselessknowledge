@@ -1,0 +1,11 @@
+# Allow all friendly crawlers access to the site
+User-agent: *
+
+# Disallow crawling of the submission page
+Disallow: /share.html
+
+# Allow crawling of the homepage (often redundant, but explicit)
+Allow: /
+
+# Specify the location of the sitemap
+Sitemap: https://uselessknowledge.me/sitemap.xml
