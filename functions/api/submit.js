@@ -45,7 +45,7 @@ export async function onRequestPost(context) {
     const recaptchaResult = await recaptchaResponse.json();
 
     // Check if reCAPTCHA verification failed
-    // You might add score checking for v3: && recaptchaResult.score > 0.5
+    // Add score checking if desired: && recaptchaResult.score > 0.5
     if (!recaptchaResult.success) {
       console.error('reCAPTCHA verification failed:', recaptchaResult['error-codes']);
       return new Response(JSON.stringify({ success: false, message: 'reCAPTCHA validation failed.' }), {
@@ -53,18 +53,18 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    // console.log('reCAPTCHA score:', recaptchaResult.score); // Optional: Log score for tuning
 
     // 3. Insert Data into Supabase (if reCAPTCHA is valid)
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Prepare data for insertion (handle nulls - although client already does this)
+    // Prepare data for insertion, including the new social_handle field
     const dataToInsert = {
         headline: formData.headline || null,
         knowledge_domain: formData.knowledge_domain, // Required field
         knowledge_details: formData.knowledge_details, // Required field
         day_job: formData.day_job, // Required field
         name: formData.name || null,
+        social_handle: formData.social_handle || null // Add the new optional field
     };
 
     // Validate required fields server-side as well (basic check)
@@ -78,7 +78,7 @@ export async function onRequestPost(context) {
 
     const { error: insertError } = await supabase
       .from(TABLE_NAME)
-      .insert([dataToInsert]);
+      .insert([dataToInsert]); // Send the prepared data
 
     if (insertError) {
       console.error('Supabase Insert Error:', insertError);
@@ -95,7 +95,6 @@ export async function onRequestPost(context) {
     });
 
   } catch (err) {
-     // Handle potential JSON parsing errors or other unexpected errors
     if (err instanceof SyntaxError) {
          return new Response(JSON.stringify({ success: false, message: 'Invalid request format.' }), {
             status: 400,
@@ -109,11 +108,3 @@ export async function onRequestPost(context) {
     });
   }
 }
-
-// Optional: Handle other methods
-// export async function onRequest(context) {
-//   if (context.request.method === 'POST') {
-//     return await onRequestPost(context);
-//   }
-//   return new Response('Method Not Allowed', { status: 405 });
-// }

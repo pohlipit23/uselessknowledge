@@ -7,12 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.google.com/recaptcha/api.js?render=6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+         }
         .proof-item { transition: transform 0.2s ease-in-out; }
         .proof-item:hover { transform: translateY(-3px); }
-        #knowledgeModal { z-index: 50; }
+        /* Removed modal styles */
         .loading-placeholder::after { content: 'Loading...'; color: #9ca3af; }
         .error-placeholder::after { content: 'Could not load entries.'; color: #ef4444; }
     </style>
@@ -23,9 +24,9 @@
 
         <div class="flex justify-between items-center mb-12">
             <span class="text-xl font-bold text-gray-800">Useless Knowledge</span>
-            <button id="openModalBtnHeader" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm transition duration-200 flex-shrink-0">
+            <a href="/share.html" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm transition duration-200 flex-shrink-0">
                 Share!
-            </button>
+            </a>
         </div>
 
         <section class="mb-10">
@@ -49,89 +50,25 @@
 
         <section>
              <p class="text-lg text-gray-600 mb-6"> Ready to share yours? Don't be shy! </p>
-            <button id="openModalBtnMain" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out text-xl transform hover:-translate-y-0.5">
+             <a href="/share.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out text-xl transform hover:-translate-y-0.5">
                 Share Your Useless Knowledge!
-            </button>
+            </a>
         </section>
 
         <footer class="mt-12 text-center text-gray-500 text-sm">
              &copy; 2025 uselessknowledge.io - A fun experiment.
         </footer>
     </div>
-    <div id="knowledgeModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden">
-        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-xl max-w-lg w-full relative text-left overflow-y-auto max-h-[90vh]">
-            <button id="closeModalBtn" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
-            <h3 class="text-2xl font-semibold text-gray-800 mb-6">Share your Knowledge</h3>
-            <form id="knowledgeForm">
-                 <div class="mb-4">
-                    <label for="knowledge_domain" class="block text-sm font-medium text-gray-700 mb-1">Knowledge Domain*</label>
-                    <input type="text" id="knowledge_domain" name="knowledge_domain" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 14th Century Fermentation" required>
-                    <p class="text-xs text-gray-500 mt-1">Your specific area of 'useless' expertise.</p>
-                </div>
-                <div class="mb-4">
-                    <label for="knowledge_details" class="block text-sm font-medium text-gray-700 mb-1">Details*</label>
-                    <textarea id="knowledge_details" name="knowledge_details" rows="4" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., I've recreated 12 historically accurate brewing methods..." required></textarea>
-                    <p class="text-xs text-gray-500 mt-1">Give us a brief, fun description of your knowledge.</p>
-                </div>
-                <div class="mb-4">
-                    <label for="day_job" class="block text-sm font-medium text-gray-700 mb-1">Your Day Job*</label>
-                    <input type="text" id="day_job" name="day_job" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Pediatric Nurse" required>
-                    <p class="text-xs text-gray-500 mt-1">What you do professionally (adds to the fun contrast!).</p>
-                </div>
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name (Optional)</label>
-                    <input type="text" id="name" name="name" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Alex P.">
-                    <p class="text-xs text-gray-500 mt-1">Your name or initials, if you'd like to be credited.</p>
-                </div>
-                <div class="mb-4">
-                    <label for="headline" class="block text-sm font-medium text-gray-700 mb-1">Headline (Optional)</label>
-                    <input type="text" id="headline" name="headline" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Medieval Brewing Techniques Expert">
-                    <p class="text-xs text-gray-500 mt-1">A catchy title for your expertise (used for display).</p>
-                </div>
-                 <p id="submission-message" class="text-sm mt-4 mb-4"></p>
-                <div class="text-right">
-                    <button type="submit" id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200 disabled:opacity-50">
-                        Submit My Knowledge
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
-        // --- Configuration ---
-        // REMOVED Supabase credentials
-        const RECAPTCHA_SITE_KEY = '6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0';
-        // API endpoints served by Cloudflare Functions
+        // API endpoint served by Cloudflare Functions
         const TESTIMONIALS_API_ENDPOINT = '/api/testimonials';
-        const SUBMIT_API_ENDPOINT = '/api/submit';
 
         // --- DOM Elements ---
-        const modal = document.getElementById('knowledgeModal');
-        const openModalBtnMain = document.getElementById('openModalBtnMain');
-        const openModalBtnHeader = document.getElementById('openModalBtnHeader');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const knowledgeForm = document.getElementById('knowledgeForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const submissionMessage = document.getElementById('submission-message');
         const testimonialsGrid = document.getElementById('testimonialsGrid');
 
-        // --- Modal Logic (Remains the same) ---
-        const openModal = () => {
-            if(modal) modal.classList.remove('hidden');
-            if(submissionMessage) submissionMessage.textContent = '';
-        }
-        const closeModal = () => {
-             if(modal) modal.classList.add('hidden');
-        }
-        if(openModalBtnMain) openModalBtnMain.addEventListener('click', openModal);
-        if(openModalBtnHeader) openModalBtnHeader.addEventListener('click', openModal);
-        if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-        if(modal) modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
-
-        // --- Testimonial Loading (Updated to use Fetch API) ---
+        // --- Testimonial Loading ---
         async function loadTestimonials() {
-            if(!testimonialsGrid) return; // Exit if grid element not found
+            if(!testimonialsGrid) return;
             testimonialsGrid.innerHTML = ''; // Clear placeholder/previous content immediately
 
             // Add loading placeholders
@@ -144,7 +81,6 @@
             try {
                 const response = await fetch(TESTIMONIALS_API_ENDPOINT);
                 if (!response.ok) {
-                    // Throw an error with status text if response not OK
                     throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
                 }
                 const data = await response.json();
@@ -173,76 +109,9 @@
                     testimonialsGrid.innerHTML = '<p class="col-span-1 sm:col-span-2 text-center text-gray-500">Be the first to share your knowledge!</p>';
                 }
             } catch (error) {
-                console.error('Error loading testimonials:', error); // Keep console.error for debugging fetch issues
+                console.error('Error loading testimonials:', error); // Keep console.error
                  if(testimonialsGrid) testimonialsGrid.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500">Could not load testimonials. Please try refreshing.</div>';
             }
-        }
-
-        // --- Form Submission Logic (Updated to use Fetch API) ---
-        if(knowledgeForm) {
-            knowledgeForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                submitBtn.disabled = true;
-                submissionMessage.textContent = 'Submitting...';
-                submissionMessage.className = 'text-sm mt-4 mb-4 text-blue-600';
-
-                // Check if grecaptcha is loaded
-                if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
-                     console.error("reCAPTCHA library not loaded correctly."); // Keep console.error
-                     submissionMessage.textContent = 'CAPTCHA error. Please refresh and try again.';
-                     submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
-                     submitBtn.disabled = false;
-                     return;
-                }
-
-                grecaptcha.ready(function() {
-                    grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
-                        const formData = new FormData(knowledgeForm);
-                        const submissionData = Object.fromEntries(formData.entries());
-
-                        // Add reCAPTCHA token to the data being sent
-                        submissionData.recaptchaToken = token;
-
-                        try {
-                            const response = await fetch(SUBMIT_API_ENDPOINT, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(submissionData),
-                            });
-
-                            const result = await response.json(); // Try to parse JSON regardless of status
-
-                            if (!response.ok) {
-                                // Throw an error with message from API response or default message
-                                throw new Error(result.message || `Server error: ${response.status}`);
-                            }
-
-                            // Success
-                            submissionMessage.textContent = result.message || 'Thank you for sharing your knowledge!';
-                            submissionMessage.className = 'text-sm mt-4 mb-4 text-green-600';
-                            knowledgeForm.reset();
-                            await loadTestimonials(); // Refresh testimonials
-                            setTimeout(closeModal, 1500);
-
-                        } catch (error) {
-                            console.error('Error submitting data:', error); // Keep console.error
-                            submissionMessage.textContent = `Submission failed: ${error.message || 'Please try again.'}`;
-                            submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
-                        } finally {
-                            submitBtn.disabled = false; // Re-enable button
-                        }
-                    }).catch(function (error) {
-                         console.error('reCAPTCHA execution error:', error); // Keep console.error
-                         submissionMessage.textContent = 'CAPTCHA error. Please try again.';
-                         submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
-                         submitBtn.disabled = false;
-                     });
-                });
-            });
-        } else {
-             console.error("Knowledge form not found."); // Keep console.error
         }
 
         // --- Initial Load ---

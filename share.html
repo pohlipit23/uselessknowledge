@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Useless Knowledge</title>
+    <script src="https://cdn.tailwindcss.com"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen pt-10 pb-10">
+
+    <header class="mb-10">
+        <div class="max-w-3xl mx-auto px-6 flex justify-between items-center">
+             <a href="/" class="text-xl font-bold text-gray-800 hover:text-blue-600">Useless Knowledge</a>
+            <a href="/" class="text-sm text-blue-600 hover:underline">Back to Home</a>
+        </div>
+    </header>
+
+    <main class="flex justify-center px-6">
+        <div class="bg-white p-8 sm:p-12 rounded-xl shadow-lg max-w-3xl w-full">
+            <div id="form-container">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Share your Knowledge</h2>
+                <form id="knowledgeForm">
+                    <div class="mb-4">
+                        <label for="knowledge_domain" class="block text-sm font-medium text-gray-700 mb-1">Knowledge Domain*</label>
+                        <input type="text" id="knowledge_domain" name="knowledge_domain" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 14th Century Fermentation" required>
+                        <p class="text-xs text-gray-500 mt-1">Your specific area of 'useless' expertise.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="knowledge_details" class="block text-sm font-medium text-gray-700 mb-1">Details*</label>
+                        <textarea id="knowledge_details" name="knowledge_details" rows="4" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., I've recreated 12 historically accurate brewing methods..." required></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Give us a brief, fun description of your knowledge.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="day_job" class="block text-sm font-medium text-gray-700 mb-1">Your Day Job*</label>
+                        <input type="text" id="day_job" name="day_job" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Pediatric Nurse" required>
+                        <p class="text-xs text-gray-500 mt-1">What you do professionally (adds to the fun contrast!).</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name (Optional)</label>
+                        <input type="text" id="name" name="name" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Alex P.">
+                        <p class="text-xs text-gray-500 mt-1">Your name or initials, if you'd like to be credited.</p>
+                    </div>
+                     <div class="mb-4">
+                        <label for="social_handle" class="block text-sm font-medium text-gray-700 mb-1">Social Handle (Optional)</label>
+                        <input type="text" id="social_handle" name="social_handle" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., linkedin.com/in/yourname or @yourhandle">
+                        <p class="text-xs text-gray-500 mt-1">Share your LinkedIn, Facebook or other social handle if you want to stay in touch.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="headline" class="block text-sm font-medium text-gray-700 mb-1">Headline (Optional)</label>
+                        <input type="text" id="headline" name="headline" maxlength="100" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Medieval Brewing Techniques Expert">
+                        <p class="text-xs text-gray-500 mt-1">A catchy title for your expertise (used for display).</p>
+                    </div>
+                     <p id="submission-message" class="text-sm mt-4 mb-4"></p>
+                     <div class="text-right">
+                        <button type="submit" id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200 disabled:opacity-50">
+                            Submit My Knowledge
+                        </button>
+                    </div>
+                </form>
+            </div> <div id="confirmation-container" class="hidden text-center py-8">
+                <h2 class="text-2xl font-semibold text-green-600 mb-4">Success!</h2>
+                <p class="text-lg text-gray-700 mb-8">Thank you for sharing something about your hidden interest and knowledge!</p>
+                <a href="/" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out">
+                    Back to Home
+                </a>
+            </div> </div>
+    </main>
+
+    <script>
+        // --- Configuration ---
+        const RECAPTCHA_SITE_KEY = '6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0';
+        const SUBMIT_API_ENDPOINT = '/api/submit'; // CF Function endpoint
+
+        // --- DOM Elements ---
+        const knowledgeForm = document.getElementById('knowledgeForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const submissionMessage = document.getElementById('submission-message');
+        const formContainer = document.getElementById('form-container');
+        const confirmationContainer = document.getElementById('confirmation-container');
+
+        // --- Form Submission Logic ---
+        if (knowledgeForm && submitBtn && submissionMessage && formContainer && confirmationContainer) {
+            knowledgeForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                submitBtn.disabled = true;
+                submissionMessage.textContent = 'Submitting...';
+                submissionMessage.className = 'text-sm mt-4 mb-4 text-blue-600'; // Reset style
+
+                // Check if grecaptcha is loaded
+                if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
+                     console.error("reCAPTCHA library not loaded correctly.");
+                     submissionMessage.textContent = 'CAPTCHA error. Please refresh and try again.';
+                     submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
+                     submitBtn.disabled = false;
+                     return;
+                }
+
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
+                        const formData = new FormData(knowledgeForm);
+                        const submissionData = Object.fromEntries(formData.entries());
+
+                        submissionData.recaptchaToken = token;
+
+                        // Set optional fields to null if empty before sending to backend
+                        // (Backend function also handles this, but good practice here too)
+                        if (!submissionData.headline) submissionData.headline = null;
+                        if (!submissionData.name) submissionData.name = null;
+                        if (!submissionData.social_handle) submissionData.social_handle = null; // Handle new optional field
+
+                        try {
+                            const response = await fetch(SUBMIT_API_ENDPOINT, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', },
+                                body: JSON.stringify(submissionData),
+                            });
+
+                            const result = await response.json();
+
+                            if (!response.ok) {
+                                throw new Error(result.message || `Server error: ${response.status}`);
+                            }
+
+                            // Success: Hide form, show confirmation
+                            if(formContainer) formContainer.classList.add('hidden');
+                            if(confirmationContainer) confirmationContainer.classList.remove('hidden');
+
+                        } catch (error) {
+                            console.error('Error submitting data:', error);
+                            submissionMessage.textContent = `Submission failed: ${error.message || 'Please try again.'}`;
+                            submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
+                        } finally {
+                             if (!confirmationContainer || confirmationContainer.classList.contains('hidden')) {
+                                 submitBtn.disabled = false;
+                            }
+                        }
+                    }).catch(function (error) {
+                         console.error('reCAPTCHA execution error:', error);
+                         submissionMessage.textContent = 'CAPTCHA error. Please try again.';
+                         submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
+                         submitBtn.disabled = false;
+                     });
+                });
+            });
+        } else {
+             console.error("Required form elements not found on share page.");
+        }
+    </script>
+
+</body>
+</html>
