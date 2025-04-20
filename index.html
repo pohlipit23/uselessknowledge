@@ -7,12 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://www.google.com/recaptcha/api.js?render=6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-         }
+        body { font-family: 'Inter', sans-serif; }
         .proof-item { transition: transform 0.2s ease-in-out; }
         .proof-item:hover { transform: translateY(-3px); }
         #knowledgeModal { z-index: 50; }
@@ -103,25 +100,11 @@
 
     <script>
         // --- Configuration ---
-        const SUPABASE_URL = 'https://icmgidovdzriuzpmpndm.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljbWdpZG92ZHpyaXV6cG1wbmRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMzI0MjAsImV4cCI6MjA2MDYwODQyMH0.ljhC-PUryt78KrNXK0buhsBF9e6LapUWvMr-d5X8cfU';
+        // REMOVED Supabase credentials
         const RECAPTCHA_SITE_KEY = '6LfliB0rAAAAAEP2Psen6udDdqVA7Tiwu_CWFBD0';
-        const TABLE_NAME = 'knowledge_entries'; // Still needed for insert
-        const RPC_FUNCTION_NAME = 'get_random_knowledge_entries'; // Name of the function created in Supabase
-
-        // --- Initialize Supabase Client ---
-        let supabaseClient;
-        try {
-            if (window.supabase) {
-                 const { createClient } = window.supabase;
-                 supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                 // Removed console.log
-            } else { throw new Error("Supabase library not loaded"); }
-        } catch (error) {
-            console.error("Error initializing Supabase:", error); // Keep console.error
-             const testimonialsGridError = document.getElementById('testimonialsGrid');
-             if(testimonialsGridError) testimonialsGridError.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500">Error: Could not connect to database services.</div>';
-        }
+        // API endpoints served by Cloudflare Functions
+        const TESTIMONIALS_API_ENDPOINT = '/api/testimonials';
+        const SUBMIT_API_ENDPOINT = '/api/submit';
 
         // --- DOM Elements ---
         const modal = document.getElementById('knowledgeModal');
@@ -133,7 +116,7 @@
         const submissionMessage = document.getElementById('submission-message');
         const testimonialsGrid = document.getElementById('testimonialsGrid');
 
-        // --- Modal Logic ---
+        // --- Modal Logic (Remains the same) ---
         const openModal = () => {
             if(modal) modal.classList.remove('hidden');
             if(submissionMessage) submissionMessage.textContent = '';
@@ -146,31 +129,29 @@
         if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
         if(modal) modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
 
-        // --- Testimonial Loading (Updated to use RPC) ---
+        // --- Testimonial Loading (Updated to use Fetch API) ---
         async function loadTestimonials() {
-            if (!supabaseClient) {
-                console.error("Supabase client not available for loading testimonials."); // Keep console.error
-                if(testimonialsGrid && !testimonialsGrid.innerHTML.includes('Error:')) {
-                     testimonialsGrid.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500 error-placeholder"></div>';
-                }
-                return;
+            if(!testimonialsGrid) return; // Exit if grid element not found
+            testimonialsGrid.innerHTML = ''; // Clear placeholder/previous content immediately
+
+            // Add loading placeholders
+            for (let i = 0; i < 4; i++) {
+                const placeholder = document.createElement('div');
+                placeholder.className = `bg-gray-100 p-4 rounded-lg shadow-sm loading-placeholder ${i > 0 ? 'hidden sm:block' : ''}`;
+                testimonialsGrid.appendChild(placeholder);
             }
 
             try {
-                // Removed console.log for RPC call
-                const { data, error } = await supabaseClient
-                    .rpc(RPC_FUNCTION_NAME, { limit_count: 4 });
-
-                if (error) {
-                    console.error(`RPC Error (${RPC_FUNCTION_NAME}):`, error); // Keep console.error
-                    throw error;
+                const response = await fetch(TESTIMONIALS_API_ENDPOINT);
+                if (!response.ok) {
+                    // Throw an error with status text if response not OK
+                    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
                 }
+                const data = await response.json();
 
-                if(!testimonialsGrid) return;
-                testimonialsGrid.innerHTML = '';
+                testimonialsGrid.innerHTML = ''; // Clear placeholders again
 
                 if (data && data.length > 0) {
-                    // Removed console.log for fetched data
                     const bgColors = ['bg-blue-50', 'bg-green-50', 'bg-yellow-50', 'bg-purple-50'];
                     const textColors = ['text-blue-700', 'text-green-700', 'text-yellow-700', 'text-purple-700'];
                     const borderColors = ['border-blue-200', 'border-green-200', 'border-yellow-200', 'border-purple-200'];
@@ -192,25 +173,20 @@
                     testimonialsGrid.innerHTML = '<p class="col-span-1 sm:col-span-2 text-center text-gray-500">Be the first to share your knowledge!</p>';
                 }
             } catch (error) {
-                console.error('Error loading testimonials:', error); // Keep console.error
-                 if(testimonialsGrid) testimonialsGrid.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500 error-placeholder"></div>';
+                console.error('Error loading testimonials:', error); // Keep console.error for debugging fetch issues
+                 if(testimonialsGrid) testimonialsGrid.innerHTML = '<div class="col-span-1 sm:col-span-2 text-center text-red-500">Could not load testimonials. Please try refreshing.</div>';
             }
         }
 
-        // --- Form Submission Logic ---
+        // --- Form Submission Logic (Updated to use Fetch API) ---
         if(knowledgeForm) {
             knowledgeForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 submitBtn.disabled = true;
                 submissionMessage.textContent = 'Submitting...';
                 submissionMessage.className = 'text-sm mt-4 mb-4 text-blue-600';
-                 if (!supabaseClient) {
-                    console.error("Supabase client not available for submission."); // Keep console.error
-                    submissionMessage.textContent = 'Error: Cannot connect to database services.';
-                    submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
-                    submitBtn.disabled = false;
-                    return;
-                }
+
+                // Check if grecaptcha is loaded
                 if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
                      console.error("reCAPTCHA library not loaded correctly."); // Keep console.error
                      submissionMessage.textContent = 'CAPTCHA error. Please refresh and try again.';
@@ -221,27 +197,41 @@
 
                 grecaptcha.ready(function() {
                     grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
-                        // Removed console.log for token
                         const formData = new FormData(knowledgeForm);
                         const submissionData = Object.fromEntries(formData.entries());
 
-                        if (!submissionData.headline) submissionData.headline = null;
-                        if (!submissionData.name) submissionData.name = null;
+                        // Add reCAPTCHA token to the data being sent
+                        submissionData.recaptchaToken = token;
 
                         try {
-                            const { error } = await supabaseClient.from(TABLE_NAME).insert([submissionData]);
-                            if (error) throw error;
-                            submissionMessage.textContent = 'Thank you for sharing your knowledge!';
+                            const response = await fetch(SUBMIT_API_ENDPOINT, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(submissionData),
+                            });
+
+                            const result = await response.json(); // Try to parse JSON regardless of status
+
+                            if (!response.ok) {
+                                // Throw an error with message from API response or default message
+                                throw new Error(result.message || `Server error: ${response.status}`);
+                            }
+
+                            // Success
+                            submissionMessage.textContent = result.message || 'Thank you for sharing your knowledge!';
                             submissionMessage.className = 'text-sm mt-4 mb-4 text-green-600';
                             knowledgeForm.reset();
-                            await loadTestimonials();
+                            await loadTestimonials(); // Refresh testimonials
                             setTimeout(closeModal, 1500);
+
                         } catch (error) {
                             console.error('Error submitting data:', error); // Keep console.error
                             submissionMessage.textContent = `Submission failed: ${error.message || 'Please try again.'}`;
                             submissionMessage.className = 'text-sm mt-4 mb-4 text-red-600';
                         } finally {
-                            submitBtn.disabled = false;
+                            submitBtn.disabled = false; // Re-enable button
                         }
                     }).catch(function (error) {
                          console.error('reCAPTCHA execution error:', error); // Keep console.error
@@ -257,12 +247,7 @@
 
         // --- Initial Load ---
          document.addEventListener('DOMContentLoaded', () => {
-            if (supabaseClient) {
-                 loadTestimonials();
-            } else {
-                 // Removed console.log
-                 // Error message is handled in the init block
-            }
+            loadTestimonials(); // Load testimonials on page load via API
          });
     </script>
 
