@@ -42,6 +42,6 @@ Here are some details of how I developed [uselessknowledge.me](https://www.usele
 
 For questions, feedback, or just to share your own useless knowledge directly, feel free to reach out:
 
-pete@08-08-08.com
+pete@08-08-08.com / 
 
 ---
