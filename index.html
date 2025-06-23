@@ -54,8 +54,9 @@
         .error-placeholder::after { content: 'Could not load entries.'; color: #ef4444; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen flex flex-col">
 
+    <div class="flex-grow flex items-center justify-center p-6">
     <div class="bg-white p-8 sm:p-12 rounded-xl shadow-lg max-w-3xl w-full text-center">
 
         <div class="flex justify-between items-center mb-12">
@@ -66,7 +67,8 @@
         </div>
 
         <section class="mb-10">
-            <img src="/uselessknowledge_transparent.png" alt="Useless Knowledge logo" class="w-24 mx-auto mb-4">
+           <img src="/uselessknowledge_transparent.png" alt="Useless Knowledge logo" class="w-24 mx-auto mb-4">
+
             <h1 class="text-4xl sm:text-5xl font-bold text-gray-800 mb-5 leading-tight">
                 Everyone's an Expert at<br>Something
             </h1>
@@ -95,11 +97,13 @@
             </a>
         </section>
 
-        <footer class="mt-12 text-center text-gray-500 text-sm">
-             &copy; <span id="currentYear"></span> uselessknowledge.me - A fun experiment.<br>
-             <a href="https://twitter.com/uselessknowledge" class="text-blue-600 hover:underline">@uselessknowledge</a>
-        </footer>
+
     </div>
+    </div>
+    <footer class="text-center py-4 text-gray-500 text-sm">
+         &copy; <span id="currentYear"></span> uselessknowledge.me - A fun experiment.<br>
+         <a href="https://twitter.com/uselessknowledge" class="text-blue-600 hover:underline">@uselessknowledge</a>
+    </footer>
     <script>
         // API endpoint served by Cloudflare Functions
         const TESTIMONIALS_API_ENDPOINT = '/api/testimonials';
