@@ -135,13 +135,29 @@
                         const card = document.createElement('div');
                         const colorIndex = index % bgColors.length;
                         card.className = `${bgColors[colorIndex]} p-4 rounded-lg shadow-sm proof-item flex flex-col h-full`;
-                        card.innerHTML = `
-                            <h4 class="text-lg font-semibold text-gray-900 mb-1">${entry.headline || 'Expertise Headline'}</h4>
-                            <p class="text-sm ${textColors[colorIndex]} mb-2">${entry.day_job || 'Professional'} by day</p>
-                            <blockquote class="text-gray-700 italic border-l-4 ${borderColors[colorIndex]} pl-3 text-sm flex-grow">
-                                "${entry.knowledge_details || 'No details provided.'}" </blockquote>
-                            ${entry.name ? `<span class="text-xs text-gray-500 mt-2 text-right">- ${entry.name}</span>` : ''}
-                        `;
+
+                        const headline = document.createElement('h4');
+                        headline.className = 'text-lg font-semibold text-gray-900 mb-1';
+                        headline.textContent = entry.headline || 'Expertise Headline';
+                        card.appendChild(headline);
+
+                        const dayJob = document.createElement('p');
+                        dayJob.className = `text-sm ${textColors[colorIndex]} mb-2`;
+                        dayJob.textContent = `${entry.day_job || 'Professional'} by day`;
+                        card.appendChild(dayJob);
+
+                        const quote = document.createElement('blockquote');
+                        quote.className = `text-gray-700 italic border-l-4 ${borderColors[colorIndex]} pl-3 text-sm flex-grow`;
+                        quote.textContent = entry.knowledge_details || 'No details provided.';
+                        card.appendChild(quote);
+
+                        if (entry.name) {
+                            const nameSpan = document.createElement('span');
+                            nameSpan.className = 'text-xs text-gray-500 mt-2 text-right';
+                            nameSpan.textContent = `- ${entry.name}`;
+                            card.appendChild(nameSpan);
+                        }
+
                         testimonialsGrid.appendChild(card);
                     });
                 } else {
