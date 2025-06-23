@@ -97,7 +97,7 @@
             knowledgeForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 submitBtn.disabled = true;
-                submissionMessage.textContent = 'Submitting...';
+                submissionMessage.innerHTML = '<span class="animate-pulse">Submitting...</span>';
                 submissionMessage.className = 'text-sm mt-4 mb-4 text-blue-600'; // Reset style
 
                 if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
@@ -138,6 +138,8 @@
                                 console.error('gtag function was not found when trying to send GA event.');
                             }
 
+                            submissionMessage.innerHTML = '✅ Submitted!';
+                            submissionMessage.className = 'text-sm mt-4 mb-4 text-green-600';
                             if(formContainer) formContainer.classList.add('hidden');
                             if(confirmationContainer) confirmationContainer.classList.remove('hidden');
 
